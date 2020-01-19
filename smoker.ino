@@ -51,8 +51,8 @@ void printAddress(DeviceAddress deviceAddress)
 
 void handle_root() {
     sensors.requestTemperatures();
-    float pitTemp = sensors.getTempF(pitProbe);
-    float meatTemp = sensors.getTempF(meatProbe);
+    float pitTemp = calibratePitTempF(sensors.getTempF(pitProbe));
+    float meatTemp = calibrateMeatTempF(sensors.getTempF(meatProbe));
 
     String msg = "Pit probe goes on the left, meat probe goes on the right.\n\n";
     if (isnan(pitTemp)) {
@@ -140,11 +140,25 @@ void loop() {
     }
 }
 
+float calibratePitTempF(float pitTemp) {
+    if (isnan(pitTemp)) {
+        return pitTemp;
+    }
+    return map(pitTemp, 41, 362, 33, 360) - 2;
+}
+
+float calibrateMeatTempF(float meatTemp) {
+    if (isnan(meatTemp)) {
+        return meatTemp;
+    }
+    return map(meatTemp, 35, 365, 33, 360) + 2;
+}
+
 void update() {
-    if (MQTT_connect() != 0) {
+    if (MQTT_connect() == 0) {
         sensors.requestTemperatures();
-        float pitTemp = sensors.getTempC(pitProbe);
-        float meatTemp = sensors.getTempC(meatProbe);
+        float pitTemp = calibratePitTempF(sensors.getTempF(pitProbe));
+        float meatTemp = calibrateMeatTempF(sensors.getTempF(meatProbe));
         pitFeed.publish(pitTemp);
         meatFeed.publish(meatTemp);
     }
