@@ -1,0 +1,19 @@
+# Settings for the MQTT Client. Currently only these three are supported
+mqtt:
+  server: tcp://mosquitto:1883
+  topic_path: 'prometheus/room/smoker/+'
+  metric_per_topic_config:
+    metric_name_regex: "prometheus/room/smoker/(?P<metricname>.*)"
+  qos: 0
+cache:
+  # Timeout. Each received metric will be presented for this time if no update is send via MQTT.
+  # Set the timeout to -1 to disable the deletion of metrics from the cache. The exporter presents the ingest timestamp
+  # to prometheus.
+  timeout: 5m
+metrics:
+  - prom_name: temperature
+    mqtt_name: pitTemperature
+    type: gauge
+  - prom_name: temperature
+    mqtt_name: meatTemperature
+    type: gauge

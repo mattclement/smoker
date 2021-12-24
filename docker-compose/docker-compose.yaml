@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  mqtt:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: always
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+    ports:
+      - 1883:1883
+  mqtt-exporter:
+    container_name: mqtt_exporter
+    image: hikhvar/mqtt2prometheus:v0.1.5
+    restart: always
+    volumes:
+      - ./exporter/config.yaml:/config.yaml
+    ports:
+      - 9641:9641
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss:latest
+    ports:
+      - 3000:3000
+
